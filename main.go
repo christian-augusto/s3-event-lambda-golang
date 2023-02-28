@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -26,8 +25,8 @@ func main() {
 	lambda.Start(handler)
 }
 
-func handler(event events.S3Event) error {
-	return writeFileAndUpload(event.Records[0].S3.Object.Key)
+func handler(event Event) error {
+	return writeFileAndUpload("")
 }
 
 func writeFileAndUpload(someContent string) error {
@@ -47,8 +46,6 @@ func writeFileAndUpload(someContent string) error {
 
 	fmt.Println("arquivo local criado ...")
 
-	defer file.Close()
-
 	fmt.Println("escrevendo no arquivo local ...")
 
 	_, err = file.WriteString(fileContent)
@@ -58,6 +55,8 @@ func writeFileAndUpload(someContent string) error {
 	}
 
 	fmt.Println("terminando de escrever no arquivo local ...")
+
+	file.Close()
 
 	sess, err := session.NewSession(
 		&aws.Config{
